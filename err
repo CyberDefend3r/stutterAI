@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+function err() {
+    lastCMD=$(fc -n -l -1)
+    lastCMD=$(echo $lastCMD | awk '{$1=$1};1')
+    read -n1 -r -p " Is this the broken command? (ENTER/ESC): $lastCMD"
+    if [[ $REPLY == $'' ]]; then
+        errmsg=$(fc -s 2>lastcmderror.log > /dev/null; cat lastcmderror.log | tail -n 1)
+        rm lastcmderror.log
+        echo "$lastCMD //// $errmsg" | ~/.local/lib/stutterAI/stutterAI.py > temp_command.txt
+        status=$?
+        cmd=$(echo "$(tail -n 1 temp_command.txt)")
+        rm temp_command.txt
+        reloadHISTORY="history -w; history -c; history -r"
+        case $status in
+            1)
+                echo "err: $cmd"
+                ;;
+            0)
+                read -n1 -r -s -p " Want to try this command?   (ENTER/ESC): $cmd"
+                if [[ $REPLY == $'' ]]; then
+                    history -d $( history | awk 'END{print $1-1}' )
+                    history -sp $cmd
+                    eval $reloadHISTORY
+                    echo -e $'\n Press \u2191 UP \u2191'
+                elif [[ $REPLY == $'\e' ]]; then
+                    history -d $( history | awk 'END{print $1-1}' )
+                    eval $reloadHISTORY
+                    echo -e $'\n I am still learning and may come up with a correct command next time.'
+                else
+                    history -d $( history | awk 'END{print $1-1}' )
+                    eval $reloadHISTORY
+                    echo -e $'\n Bye!'
+                fi
+                ;;
+            200)
+                history -d $( history | awk 'END{print $1-1}' )
+                eval $reloadHISTORY
+                echo -e $'\n Bye!'
+                ;;
+            210)
+                history -d $( history | awk 'END{print $1-1}' )
+                eval $reloadHISTORY
+                echo -e $'\n You have hit your openAI rate limit. Try again in 1 minute.'
+                ;;
+            215)
+                history -d $( history | awk 'END{print $1-1}' )
+                eval $reloadHISTORY
+                echo -e $'\n The secrets file is missing at location: ~/.stutterAI_secret.json'
+                echo -e $'\n The file should have your API Key with the format:\n{\n    "API_KEY": "YOUR_API_KEY_HERE"\n}'
+                ;;
+            220)
+                history -d $( history | awk 'END{print $1-1}' )
+                eval $reloadHISTORY
+                echo -e $'\n Your API Key in the secrets file is incorrect: ~/.stutterAI_secret.json'
+                ;;
+            *)
+                history -d $( history | awk 'END{print $1-1}' )
+                eval $reloadHISTORY
+                echo " Couldn't Fix Command: $cmd"
+                ;;
+        esac
+    elif [[ $REPLY == $'\e' ]]; then
+        echo -e $'\n Hmm, that was the last command in your history that you attempted to run. Did you mean to use uhm?'
+    else
+        echo -e $'\n Bye!'
+    fi
+}
