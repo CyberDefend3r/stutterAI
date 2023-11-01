@@ -34,42 +34,28 @@ mkdir -p ~/.local/bin/stutterAI
 mkdir -p ~/.local/lib/stutterAI
 
 echo "Copying files"
-# Step 1: Copy err to ~/.local/bin/stutterAI/
+# Copy err to ~/.local/bin/stutterAI/
 cp ./err ~/.local/bin/stutterAI/
 if [ $? -ne 0 ]; then
   echo "Failed to copy 'err' file. Aborting."
   exit 1
 fi
 
-# Step 2: Make err executable
-chmod +x ~/.local/bin/stutterAI/err
-if [ $? -ne 0 ]; then
-  echo "Failed to set 'err' as executable. Aborting."
-  exit 1
-fi
-
-# Step 3: Copy uhm to ~/.local/bin/stutterAI/
+# Copy uhm to ~/.local/bin/stutterAI/
 cp ./uhm ~/.local/bin/stutterAI/
 if [ $? -ne 0 ]; then
   echo "Failed to copy 'uhm' file. Aborting."
   exit 1
 fi
 
-# Step 4: Make uhm executable
-chmod +x ~/.local/bin/stutterAI/uhm
-if [ $? -ne 0 ]; then
-  echo "Failed to set 'uhm' as executable. Aborting."
-  exit 1
-fi
-
-# Step 5: Copy stutterAI.py to ~/.local/lib/stutterAI/
+# Copy stutterAI.py to ~/.local/lib/stutterAI/
 cp ./stutterAI.py ~/.local/lib/stutterAI/
 if [ $? -ne 0 ]; then
   echo "Failed to copy 'stutterAI.py' file. Aborting."
   exit 1
 fi
 
-# Step 6: Prompt for OpenAI API Key and save to JSON
+# Prompt for OpenAI API Key and save to JSON
 read -p -s "Please enter your OpenAI API Key: " api_key
 echo "{\"API_KEY\": \"$api_key\"}" > ~/.stutterAI_secret.json
 if [ $? -ne 0 ]; then
@@ -82,7 +68,7 @@ fi
 echo $'\nOverwriting API Key in memory with zeros'
 api_key=$(printf '0%.0s' {1..100})
 
-# Step 7: Add to .bashrc
+# Add to .bashrc
 # Check if the line "# stutterAI app commands" is present in ~/.bashrc
 grep -q '# stutterAI app commands' ~/.bashrc
 # $? is 0 if grep found the line, 1 otherwise
@@ -95,7 +81,7 @@ if [ $? -ne 0 ]; then
   fi
 fi
 
-# Step 8: Bash history recommendation
+# Bash history recommendation
 echo ""
 echo "To keep your bash history clean, it's recommended to add the following lines to your ~/.bashrc file:"
 echo ""
@@ -105,7 +91,7 @@ echo ""
 echo "You can add them by running the following command or with a text editor."
 echo "echo -e '\\nshopt -s histappend\\nHISTCONTROL=ignoredups:erasedups' >> ~/.bashrc"
 
-# Step 9: Echo successful installation
+# Echo successful installation
 echo ""
 echo "INSTALLATION SUCCESSFUL!"
 echo ""
