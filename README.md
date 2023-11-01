@@ -2,8 +2,8 @@
 Your AI assistant in the terminal.  
   
 stutterAI solves two huge pain points people have in the terminal using AI:  
-* Corrects typos and syntax errors in commands *[err](#err)*
-* Generates system-aware commands for you when you know what you want to do but don't know how to make it happen. *[uhm](#uhm)*
+* Corrects typos and syntax errors in commands and file paths. *[err](#err)*
+* Generates system-aware commands from a prompt. For when you know what you want to do but don't know how to make it happen. *[uhm](#uhm)*
   
 Gone are the days of scrolling through man pages, endless Google searching, hunting through stack overflow, etc.  **stutterAI** has your back.  
 
