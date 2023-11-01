@@ -19,9 +19,13 @@ It is super easy to use. There are only two commands available, and neither have
 ### err
 Did you run a command and get an error? Just type `err` and hit enter; the rest is magic.  
 
+![err](https://github.com/CyberDefend3r/stutterAI/assets/22669390/be4d7a18-f03f-4a8b-9df2-7c074c56d652)  
+  
 ### uhm
 Know what you want a command to do but don't know how to write it? Just type `uhm` and hit enter. You will get prompted to describe what you want to accomplish, then let the stutterAI do its thing.  
-
+  
+![uhm](https://github.com/CyberDefend3r/stutterAI/assets/22669390/01182918-8f38-488a-b958-b8dcb680775e)  
+  
 ## Install and Setup
 
 1. Clone or download this repository.
