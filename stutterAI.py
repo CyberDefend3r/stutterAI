@@ -8,13 +8,15 @@ import openai
 from openai import error
 
 
+MODEL = "gpt-4"
+
 try:
     with open(Path("~/.stutterAI_secret.json").expanduser(), "r") as f:
         _API_KEY_ = json.load(f)["API_KEY"]
-except FileNotFoundError:
+except FileNotFoundError or KeyError:
     raise SystemExit(215)
 
-# Data Gathering Function
+# Data Gathering
 def gather_system_data():
     current_directory = Path.cwd()
     files_folders = [str(f) for f in current_directory.glob("*")]
@@ -45,16 +47,16 @@ def gather_system_data():
 def ai_create_command(ai_prompt):
     openai.api_key = _API_KEY_
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model=MODEL,
         messages=[
             {
                 "role": "system",
-                "content": "You are an AI that creates linux terminal commands based on prompts from users. Create a working command that follows best practice and official documentation that will accomplish the users prompt. Return command only and nothing else.",
+                "content": "You are an AI that creates linux terminal commands based on prompts from users. Create a working command that follows best practice and official documentation that will accomplish the users prompt. Return command only and nothing else, unless the prompt is outside the scope of linux commands then return the exact statement 'Sorry I can't help with that.'",
             },
             {"role": "user", "content": json.dumps(ai_prompt)},
         ],
         temperature=0.6,
-        max_tokens=512,
+        max_tokens=250,
     )
     ai_command = response["choices"][0]["message"]["content"]
     return ai_command
@@ -63,7 +65,7 @@ def ai_create_command(ai_prompt):
 def ai_fix_command(data):
     openai.api_key = _API_KEY_
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model=MODEL,
         messages=[
             {
                 "role": "system",
@@ -72,7 +74,7 @@ def ai_fix_command(data):
             {"role": "user", "content": json.dumps(data)},
         ],
         temperature=0.6,
-        max_tokens=512,
+        max_tokens=250,
     )
     ai_command = response["choices"][0]["message"]["content"]
     return ai_command
@@ -81,7 +83,7 @@ def ai_fix_command(data):
 def ai_extract_path(command, error_message):
     openai.api_key = _API_KEY_
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model=MODEL,
         messages=[
             {
                 "role": "system",
@@ -102,13 +104,13 @@ def ai_extract_path(command, error_message):
 
 
 def ai_find_valid_path(path, cwd):
-    # Step 2: Validate if the path is a valid file or directory
+    # Validate if the path is a valid file or directory
     test_path = Path(path).resolve()
     if test_path.is_file() or test_path.is_dir():
-        # Step 3: If valid, return the valid path and an empty list
+        # If valid, return the valid path
         return test_path
 
-    # Step 4: If not valid, recursively remove elements from the path
+    # If not valid, recursively remove elements from the path
     path_elements = len(path.split("/"))
     correct_number_of_elements = False
     valid_path = Path(path)
@@ -123,8 +125,7 @@ def ai_find_valid_path(path, cwd):
         if not (valid_path.resolve().is_dir() or valid_path.resolve().is_file()):
             continue
         file_data = {
-            "operating_system": "linux",
-            # "current_directory_path": cwd,
+            "operating_system": platform.system(),
             "broken_file_path": path.replace('"', ""),
             "list_of_valid_paths": "\n- ".join([str(f) for f in valid_path.glob("*")]),
         }
@@ -139,26 +140,32 @@ def ai_find_valid_path(path, cwd):
                     "content": f"Operating System: {file_data['operating_system']}\nInvalid PAth: {file_data['broken_file_path']}\nThese elements are valid: {'NONE' if str(valid_path) == '.' else str(valid_path)}\nList of Valid Paths:{file_data['list_of_valid_paths']}",
                 },
             ]
-        if i >= 1:
-            ai_messages.append(
-                {
-                    "role": "user",
-                    "content": f"Previous response was still invalid. Try again using a different path.\nThese elements are now valid: {'NONE' if str(valid_path) == '.' else str(valid_path)}\nNew List of Valid Paths:{file_data['list_of_valid_paths']}",
-                }
-            )
+        i += 1
         openai.api_key = _API_KEY_
-        response = openai.ChatCompletion.create(model="gpt-4", messages=ai_messages, temperature=0.25, max_tokens=512)
+        response = openai.ChatCompletion.create(model=MODEL, messages=ai_messages, temperature=0.25, max_tokens=512)
         valid_path = Path(response["choices"][0]["message"]["content"].replace('\\"', "").replace("\\", "").replace('"', ""))
         valid_path_elements = len(str(valid_path).split("/"))
         if path_elements != valid_path_elements:
             correct_number_of_elements = False
         else:
             correct_number_of_elements = True
-        i += 1
-        if i > 10:
+        if i >= 1:
+            ai_messages.append(
+                {
+                    "role": "assistant",
+                    "content": response["choices"][0]["message"]["content"].replace('\\"', "").replace("\\", "").replace('"', ""),
+                }
+            )
+            ai_messages.append(
+                {
+                    "role": "user",
+                    "content": f"Previous response was still invalid. Try again using a different path.\nThese elements are now valid: {'NONE' if str(valid_path) == '.' else str(valid_path)}\nNew List of Valid Paths:{file_data['list_of_valid_paths']}",
+                }
+            )
+        if i > 9:
             valid_path = False
             break
-    # Step 6: Return the valid path and the list of files and folders
+
     return valid_path
 
 
@@ -187,6 +194,9 @@ def uhm(question):
     data = gather_system_data()
     ai_prompt = {"user_prompt": question, "system_information_context": data}
     ai_created_command = ai_create_command(ai_prompt)
+    if "sorry " in ai_created_command.lower():
+        print(ai_created_command)
+        raise SystemExit(1)
     print(ai_created_command)
     raise SystemExit(0)
 

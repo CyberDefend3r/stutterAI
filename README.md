@@ -7,7 +7,7 @@ stutterAI solves two huge pain points people have in the terminal using AI:
   
 Gone are the days of scrolling through man pages, endless Google searching, hunting through stack overflow, etc.  **stutterAI** has your back.  
 
-It uses the openAI gpt-4 model API *(BYOK)* by default; you can change to gpt-3.5-turbo by modifying a few lines in the `stutterAI.py` file, though, in testing it was not reliable.  
+It uses the openAI gpt-4 model API *(BYOK)* by default; you can change to gpt-3.5-turbo by modifying [this variable](https://github.com/CyberDefend3r/stutterAI/blob/main/stutterAI.py#L11) in the `stutterAI.py` file, though, in testing it was not reliable.  
 
 stutterAI will not execute any commands it generates; instead, it adds them to your bash history. Additionally, when using it to fix a previously run command, it replaces the broken command with a working one in the bash history. To run a command it makes, just press up on the keyboard and then enter.  
   
@@ -50,7 +50,7 @@ The following system information is passed to openAI to give the model the neces
   * the associated error message
   * if a file/folder path is invalid, file and folder names outside the current directory will also be shared in an attempt to repair the path in the command.
 
-You **shouldn't** have any sensitive information in these locations. However, if you don't want to send some of this information to openAI, [comment out the relevant lines](https://github.com/CyberDefend3r/stutterAI/blob/acfe985baef10af83f53e957ad6b3abb0b2f492d/stutterAI.py#L34) in the `stutterAI.py` file. This will likely result in less reliable responses when using `err`.  
+You **shouldn't** have any sensitive information in these locations. However, if you don't want to send some of this information to openAI, [comment out the relevant lines](https://github.com/CyberDefend3r/stutterAI/blob/main/stutterAI.py#L20) in the `stutterAI.py` file. This will likely result in less reliable responses when using `err`.  
   
 **Note:** When using the openAI API, openAI does not use your data to train its models but may retain your inputs/outputs for up to 30 days to identify abuse of their systems. Read openAI's privacy commitments and policies [here.](https://openai.com/enterprise-privacy)  
   
