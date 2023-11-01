@@ -72,4 +72,7 @@ Risks may include but are not limited to:
   * Anything is possible; *you get the point*.
 
 By using this application and making the personal decision to execute the commands it generates, you accept all risk associated with doing so and are solely responsible for any and all intended or unintended consequences of that decision.
-
+  
+  
+----  
+<img src="https://cdn.cdnlogo.com/logos/t/48/twitter.png" width="20px"> [@Cyb3rDefender](https://twitter.com/Cyb3rDefender)
