@@ -56,7 +56,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Prompt for OpenAI API Key and save to JSON
-read -p -s "Please enter your OpenAI API Key: " api_key
+read -s -p "Please paste your OpenAI API Key and press ENTER: " api_key
 echo "{\"API_KEY\": \"$api_key\"}" > ~/.stutterAI_secret.json
 if [ $? -ne 0 ]; then
   echo "Failed to write API Key to JSON file. Aborting."
