@@ -5,6 +5,7 @@ echo "Installing stutterAI. Your AI assistant in the terminal."
 echo ""
 
 # Check Python version
+echo "Checking Python version"
 python_version=$(python3 --version 2>&1)
 if [[ $? -ne 0 ]]; then
   echo "Python 3 is not installed. Aborting."
@@ -17,8 +18,10 @@ if [[ $(echo -e "3.10.0\n$parsed_version" | sort -V | head -n1) != "3.10.0" ]]; 
 fi
 
 # Check if OpenAI package is installed
+echo "Checking if openai python package is installed"
 pip3 list | grep openai > /dev/null 2>&1
 if [[ $? -ne 0 ]]; then
+  echo "Installing openai with pip"
   pip3 install openai --user
   if [[ $? -ne 0 ]]; then
     echo "Failed to install openai package. Aborting."
@@ -30,6 +33,7 @@ fi
 mkdir -p ~/.local/bin/stutterAI
 mkdir -p ~/.local/lib/stutterAI
 
+echo "Copying files"
 # Step 1: Copy err to ~/.local/bin/stutterAI/
 cp ./err ~/.local/bin/stutterAI/
 if [ $? -ne 0 ]; then
@@ -66,18 +70,30 @@ if [ $? -ne 0 ]; then
 fi
 
 # Step 6: Prompt for OpenAI API Key and save to JSON
-read -p "Please enter your OpenAI API Key: " api_key
+read -p -s "Please enter your OpenAI API Key: " api_key
 echo "{\"API_KEY\": \"$api_key\"}" > ~/.stutterAI_secret.json
-echo $'\nOverwriting API Key in memory with zeros'
-api_key=$(printf '0%.0s' {1..100})
-
 if [ $? -ne 0 ]; then
   echo "Failed to write API Key to JSON file. Aborting."
+  echo $'\nOverwriting API Key in memory with zeros'
+  api_key=$(printf '0%.0s' {1..100})
   exit 1
 fi
 
+echo $'\nOverwriting API Key in memory with zeros'
+api_key=$(printf '0%.0s' {1..100})
+
 # Step 7: Add to .bashrc
-echo -e $'\n\n# stutterAI app commands\nfor i in $HOME/.local/bin/stutterAI/*;\n  do source $i\ndone\n' >> ~/.bashrc
+# Check if the line "# stutterAI app commands" is present in ~/.bashrc
+grep -q '# stutterAI app commands' ~/.bashrc
+# $? is 0 if grep found the line, 1 otherwise
+if [ $? -ne 0 ]; then
+  # Append the lines to ~/.bashrc
+  echo -e $'\n\n# stutterAI app commands\nfor i in $HOME/.local/bin/stutterAI/*;\n  do source $i\ndone\n' >> ~/.bashrc
+  if [ $? -ne 0 ]; then
+    echo "Failed to update ~/.bashrc. You need to add stutterAI app commands manually to .bashrc by running the following command."
+    echo "echo -e $'\\n\\n# stutterAI app commands\\nfor i in $HOME/.local/bin/stutterAI/*;\\n  do source $i\\ndone\\n' >> ~/.bashrc"
+  fi
+fi
 
 # Step 8: Bash history recommendation
 echo ""
@@ -86,7 +102,7 @@ echo ""
 echo "shopt -s histappend"
 echo "HISTCONTROL=ignoredups:erasedups"
 echo ""
-echo "You can add them by running the following command:"
+echo "You can add them by running the following command or with a text editor."
 echo "echo -e '\\nshopt -s histappend\\nHISTCONTROL=ignoredups:erasedups' >> ~/.bashrc"
 
 # Step 9: Echo successful installation
