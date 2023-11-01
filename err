@@ -22,7 +22,7 @@ function err() {
                     history -d $( history | awk 'END{print $1-1}' )
                     history -sp $cmd
                     eval $reloadHISTORY
-                    echo -e $'\n Press \u2191 UP \u2191'
+                    echo -e $'\n Press UP \u2191'
                 elif [[ $REPLY == $'\e' ]]; then
                     history -d $( history | awk 'END{print $1-1}' )
                     eval $reloadHISTORY
