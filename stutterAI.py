@@ -51,7 +51,7 @@ def ai_create_command(ai_prompt):
         messages=[
             {
                 "role": "system",
-                "content": "You are an AI that creates linux terminal commands based on prompts from users. Create a working command that follows best practice and official documentation that will accomplish the users prompt. Return command only and nothing else, unless the prompt is outside the scope of linux commands then return the exact statement 'Sorry I can't help with that.'",
+                "content": "You are an AI that creates oneliner linux bash commands based on prompts from users. Create a working command that follows best practice and official documentation that will accomplish the users prompt. Return command only and nothing else, unless the prompt is unrelated to linux commands then return the exact statement 'Sorry I can't help with that.'",
             },
             {"role": "user", "content": json.dumps(ai_prompt)},
         ],
