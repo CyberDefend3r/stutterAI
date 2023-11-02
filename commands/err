@@ -1,68 +1,72 @@
 #!/usr/bin/env bash
 
 function err() {
-    lastCMD=$(fc -n -l -1)
-    lastCMD=$(echo $lastCMD | awk '{$1=$1};1')
-    read -n1 -r -p " Is this the broken command? (ENTER/ESC): $lastCMD"
-    if [[ $REPLY == $'' ]]; then
+    if [ $? -ne 0 ]; then
+        lastCMD=$(fc -n -l -1)
+        lastCMD=$(echo $lastCMD | awk '{$1=$1};1')
         errmsg=$(fc -s 2>lastcmderror.log > /dev/null; cat lastcmderror.log | tail -n 1)
         rm lastcmderror.log
-        echo "$lastCMD //// $errmsg" | ~/.local/lib/stutterAI/stutterAI.py > temp_command.txt
+        echo "$lastCMD //// $errmsg" | $HOME/.local/lib/stutterAI/stutterAI.py > temp_command.txt
         status=$?
         cmd=$(echo "$(tail -n 1 temp_command.txt)")
         rm temp_command.txt
         reloadHISTORY="history -w; history -c; history -r"
         case $status in
             1)
+                echo ""
                 echo "err: $cmd"
+                echo ""
                 ;;
             0)
-                read -n1 -r -s -p " Want to try this command?   (ENTER/ESC): $cmd"
+                echo ""
+                read -n1 -r -s -p "(ENTER/ESC) This should do the trick!: $cmd"
                 if [[ $REPLY == $'' ]]; then
                     history -d $( history | awk 'END{print $1-1}' )
                     history -sp $cmd
                     eval $reloadHISTORY
-                    echo -e $'\n Press UP \u2191'
+                    echo ""
+                    echo -e $'\nPress UP \u2191'
+                    echo ""
                 elif [[ $REPLY == $'\e' ]]; then
                     history -d $( history | awk 'END{print $1-1}' )
                     eval $reloadHISTORY
-                    echo -e $'\n I am still learning and may come up with a correct command next time.'
+                    echo -e $'\nI am still learning and may come up with a correct command next time.\n'
                 else
                     history -d $( history | awk 'END{print $1-1}' )
                     eval $reloadHISTORY
-                    echo -e $'\n Bye!'
+                    echo -e $'\nBye!\n'
                 fi
                 ;;
             200)
                 history -d $( history | awk 'END{print $1-1}' )
                 eval $reloadHISTORY
-                echo -e $'\n Bye!'
+                echo -e $'\nBye!\n'
                 ;;
             210)
                 history -d $( history | awk 'END{print $1-1}' )
                 eval $reloadHISTORY
-                echo -e $'\n You have hit your openAI rate limit. Try again in 1 minute.'
+                echo -e $'\nYou have hit your openAI rate limit. Try again in 1 minute.\n'
                 ;;
             215)
                 history -d $( history | awk 'END{print $1-1}' )
                 eval $reloadHISTORY
-                echo -e $'\n The secrets file is missing at location: ~/.stutterAI_secret.json'
-                echo -e $'\n The file should have your API Key with the format:\n{\n    "API_KEY": "YOUR_API_KEY_HERE"\n}'
+                echo -e $'\nThe secrets file is missing at location: $HOME/.stutterAI_secret.json'
+                echo -e $'\nThe file should have your API Key with the format:\n{\n    "API_KEY": "YOUR_API_KEY_HERE"\n}\n'
                 ;;
             220)
                 history -d $( history | awk 'END{print $1-1}' )
                 eval $reloadHISTORY
-                echo -e $'\n Your API Key in the secrets file is incorrect: ~/.stutterAI_secret.json'
+                echo -e $'\nYour API Key in the secrets file is incorrect: $HOME/.stutterAI_secret.json\n'
                 ;;
             *)
                 history -d $( history | awk 'END{print $1-1}' )
                 eval $reloadHISTORY
-                echo " Couldn't Fix Command: $cmd"
+                echo ""
+                echo "Couldn't Fix Command: $cmd"
+                echo ""
                 ;;
         esac
-    elif [[ $REPLY == $'\e' ]]; then
-        echo -e $'\n Hmm, that was the last command in your history that you attempted to run. Did you mean to use uhm?'
     else
-        echo -e $'\n Bye!'
+        echo -e $'\nThe last command you executed in this terminal was successful. Did you mean use uhm?\n'
     fi
 }
