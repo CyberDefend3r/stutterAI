@@ -1,58 +1,67 @@
 #!/usr/bin/env bash
 
 function uhm() {
-    read -p "Describe what you want to do: " question
-    echo "uhm //// $question" | ~/.local/lib/stutterAI/stutterAI.py > ai_command.txt
+    read -p "(ENTER) Describe what you want to do: " question
+    if [[ $question == $'' ]]; then
+        return
+    fi
+    echo "uhm //// $question" | $HOME/.local/lib/stutterAI/stutterAI.py > ai_command.txt
     status=$?
     cmd=$(echo "$(tail -n 1 ai_command.txt)")
     rm ai_command.txt
     reloadHISTORY="history -w; history -c; history -r"
     case $status in
         1)
+            echo ""
             echo "uhm: $cmd"
+            echo ""
             ;;
         0)
-            read -n1 -r -s -p "(ENTER/ESC) Want to try this command?: $cmd"
+            read -n1 -r -s -p "(ENTER/ESC) This should do the trick!: $cmd"
             if [[ $REPLY == $'' ]]; then
                 history -d $( history | awk 'END{print $1-1}' )
                 history -sp $cmd
                 eval $reloadHISTORY
+                echo ""
                 echo -e $'\nPress UP \u2191'
+                echo ""
             elif [[ $REPLY == $'\e' ]]; then
                 history -d $( history | awk 'END{print $1-1}' )
                 eval $reloadHISTORY
-                echo -e $'\nI am still learning and may come up with a correct command next time.'
+                echo -e $'\nI am still learning and may come up with a correct command next time.\n'
             else
                 history -d $( history | awk 'END{print $1-1}' )
                 eval $reloadHISTORY
-                echo -e $'\nBye!'
+                echo -e $'\nBye!\n'
             fi
             ;;
         200)
             history -d $( history | awk 'END{print $1-1}' )
             eval $reloadHISTORY
-            echo -e $'\nBye!'
+            echo -e $'\nBye!\n'
             ;;
         210)
             history -d $( history | awk 'END{print $1-1}' )
             eval $reloadHISTORY
-            echo -e $'\nYou have hit your openAI rate limit. Try again in 1 minute.'
+            echo -e $'\nYou have hit your openAI rate limit. Try again in 1 minute.\n'
             ;;
         215)
             history -d $( history | awk 'END{print $1-1}' )
             eval $reloadHISTORY
-            echo -e $'\nThe secrets file is missing at location: ~/.stutterAI_secret.json'
-            echo -e $'\nThe file should have your API Key with the format:\n{\n    "API_KEY": "YOUR_API_KEY_HERE"\n}'
+            echo -e $'\nThe secrets file is missing at location: $HOME/.stutterAI_secret.json'
+            echo -e $'\nThe file should have your API Key with the format:\n{\n    "API_KEY": "YOUR_API_KEY_HERE"\n}\n'
             ;;
         220)
             history -d $( history | awk 'END{print $1-1}' )
             eval $reloadHISTORY
-            echo -e $'\nYour API Key in the secrets file is incorrect: ~/.stutterAI_secret.json'
+            echo -e $'\nYour API Key in the secrets file is incorrect: $HOME/.stutterAI_secret.json\n'
             ;;
         *)
             history -d $( history | awk 'END{print $1-1}' )
             eval $reloadHISTORY
+            echo ""
             echo "Something wonky happened: $cmd"
+            echo ""
             ;;
     esac
 }
