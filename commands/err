@@ -56,7 +56,7 @@ function err() {
             220)
                 history -d $( history | awk 'END{print $1-1}' )
                 eval $reloadHISTORY
-                echo -e $'\nYour API Key in the secrets file is incorrect: $HOME/.stutterAI_secret.json\n'
+                echo -e $'\nAuth Error: Your API Key in the secrets file is incorrect: $HOME/.stutterAI_secret.json\n'
                 ;;
             *)
                 history -d $( history | awk 'END{print $1-1}' )

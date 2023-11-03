@@ -9,7 +9,7 @@ stutterAI solves two huge pain points people have in the terminal:
   
 It uses the openAI gpt-4 model API *(BYOK)* by default; you can change to gpt-3.5-turbo by modifying [this variable](https://github.com/CyberDefend3r/stutterAI/blob/main/stutterAI.py#L11) in the `stutterAI.py` file, though, in testing it was not reliable.  
 
-stutterAI will not execute any commands it generates; instead, it adds them to your bash history. Additionally, when using it to fix a previously run command, it replaces the broken command with a working one in the bash history. To run a command it makes, just press up on the keyboard and then enter.  
+stutterAI will not execute any commands it generates; instead, it adds them to your bash history. Additionally, when using it to fix a previously run command, it replaces the broken command with a working one in the bash history. To run a command it makes, just press up on the keyboard.  
   
 The decision to manipulate the bash history was really for convenience. Copy and paste in terminals suck. Added bonus is that you won't have any broken commands in your bash history, either.  
   
