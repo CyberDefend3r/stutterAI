@@ -6,7 +6,7 @@ function err() {
         lastCMD=$(echo $lastCMD | awk '{$1=$1};1')
         errmsg=$(fc -s 2>lastcmderror.log > /dev/null; cat lastcmderror.log | tail -n 1)
         rm lastcmderror.log
-        echo "$lastCMD //// $errmsg" | $HOME/.local/lib/stutterAI/stutterAI.py > temp_command.txt
+        echo "$lastCMD //// $errmsg" | $HOME/.local/bin/stutterAI/stutterAI.py > temp_command.txt
         status=$?
         cmd=$(echo "$(tail -n 1 temp_command.txt)")
         rm temp_command.txt
@@ -56,7 +56,7 @@ function err() {
             220)
                 history -d $( history | awk 'END{print $1-1}' )
                 eval $reloadHISTORY
-                echo -e $'\nYour API Key in the secrets file is incorrect: $HOME/.stutterAI_secret.json\n'
+                echo -e $'\nAuth Error: Your API Key in the secrets file is incorrect: $HOME/.stutterAI_secret.json\n'
                 ;;
             *)
                 history -d $( history | awk 'END{print $1-1}' )
