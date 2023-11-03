@@ -6,7 +6,7 @@ function err() {
         lastCMD=$(echo $lastCMD | awk '{$1=$1};1')
         errmsg=$(fc -s 2>lastcmderror.log > /dev/null; cat lastcmderror.log | tail -n 1)
         rm lastcmderror.log
-        echo "$lastCMD //// $errmsg" | $HOME/.local/lib/stutterAI/stutterAI.py > temp_command.txt
+        echo "$lastCMD //// $errmsg" | $HOME/.local/bin/stutterAI/stutterAI.py > temp_command.txt
         status=$?
         cmd=$(echo "$(tail -n 1 temp_command.txt)")
         rm temp_command.txt

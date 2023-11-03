@@ -5,7 +5,7 @@ function uhm() {
     if [[ $question == $'' ]]; then
         return
     fi
-    echo "uhm //// $question" | $HOME/.local/lib/stutterAI/stutterAI.py > ai_command.txt
+    echo "uhm //// $question" | $HOME/.local/bin/stutterAI/stutterAI.py > ai_command.txt
     status=$?
     cmd=$(echo "$(tail -n 1 ai_command.txt)")
     rm ai_command.txt
