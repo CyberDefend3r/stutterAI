@@ -16,6 +16,7 @@ try:
 except FileNotFoundError or KeyError:
     raise SystemExit(215)
 
+
 # Data Gathering
 def gather_system_data():
     current_directory = Path.cwd()
@@ -112,12 +113,14 @@ def ai_find_valid_path(path, cwd):
 
     # If not valid, recursively remove elements from the path
     path_elements = len(path.split("/"))
-    correct_number_of_elements = False
+    correct_number_of_elements = True
     valid_path = Path(path)
+    response = {}
     i = 0
     while not (correct_number_of_elements and (valid_path.resolve().is_dir() or valid_path.resolve().is_file())):
         # Remove the last element in the path
         valid_path = valid_path.parent
+        print(valid_path)
         # In case we reach the root and it's not valid (highly unlikely)
         if str(valid_path.resolve()) == "/":
             return False
@@ -129,26 +132,16 @@ def ai_find_valid_path(path, cwd):
             "broken_file_path": path.replace('"', ""),
             "list_of_valid_paths": "\n- ".join([str(f) for f in valid_path.glob("*")]),
         }
-        if i < 1:
-            ai_messages = [
-                {
-                    "role": "system",
-                    "content": "Fix the user provided invalid path by replacing elements of the invalid path with extremely similar elements from one of the valid paths. Response must have the same amount of elements as the invalid path. Respond with the fixed path ONLY and nothing else. No formatting.",
-                },
-                {
-                    "role": "user",
-                    "content": f"Operating System: {file_data['operating_system']}\nInvalid PAth: {file_data['broken_file_path']}\nThese elements are valid: {'NONE' if str(valid_path) == '.' else str(valid_path)}\nList of Valid Paths:{file_data['list_of_valid_paths']}",
-                },
-            ]
-        i += 1
-        openai.api_key = _API_KEY_
-        response = openai.ChatCompletion.create(model=MODEL, messages=ai_messages, temperature=0.25, max_tokens=512)
-        valid_path = Path(response["choices"][0]["message"]["content"].replace('\\"', "").replace("\\", "").replace('"', ""))
-        valid_path_elements = len(str(valid_path).split("/"))
-        if path_elements != valid_path_elements:
-            correct_number_of_elements = False
-        else:
-            correct_number_of_elements = True
+        ai_messages = [
+            {
+                "role": "system",
+                "content": "Fix the user provided invalid path by replacing elements of the invalid path with extremely similar elements from one of the valid paths. Response must have the same amount of elements as the invalid path. Respond with the fixed path ONLY and nothing else. No formatting.",
+            },
+            {
+                "role": "user",
+                "content": f"Operating System: {file_data['operating_system']}\nInvalid PAth: {file_data['broken_file_path']}\nThese Path elements are valid: {'NONE' if str(valid_path) == '.' else str(valid_path)}\nList of Paths with valid next elements:{file_data['list_of_valid_paths']}",
+            },
+        ]
         if i >= 1:
             ai_messages.append(
                 {
@@ -159,9 +152,21 @@ def ai_find_valid_path(path, cwd):
             ai_messages.append(
                 {
                     "role": "user",
-                    "content": f"Previous response was still invalid. Try again using a different path.\nThese elements are now valid: {'NONE' if str(valid_path) == '.' else str(valid_path)}\nNew List of Valid Paths:{file_data['list_of_valid_paths']}",
+                    "content": "Previous response was still invalid. Try again using a different path.",
                 }
             )
+        print(ai_messages)
+        openai.api_key = _API_KEY_
+        response = openai.ChatCompletion.create(model=MODEL, messages=ai_messages, temperature=0.0, max_tokens=512)
+        valid_path = Path(response["choices"][0]["message"]["content"].replace('\\"', "").replace("\\", "").replace('"', ""))
+        valid_path_elements = len(str(valid_path).split("/"))
+        print(f"\n{valid_path}\n")
+        if path_elements != valid_path_elements:
+            correct_number_of_elements = False
+        else:
+            correct_number_of_elements = True
+
+        i += 1
         if i > 9:
             valid_path = False
             break
@@ -203,23 +208,16 @@ def uhm(question):
 
 if __name__ == "__main__":
     arguments = [i.strip() for i in str(stdin.readline(-1)).split("////")]
-    if "uhm" in arguments:
-        _, question = arguments
-        try:
+    try:
+        if "uhm" in arguments:
+            _, question = arguments
             uhm(question)
-        except KeyboardInterrupt:
-            raise SystemExit(200)
-        except error.RateLimitError:
-            raise SystemExit(210)
-        except error.AuthenticationError:
-            raise SystemExit(220)
-    else:
-        last_command, error_message = arguments
-        try:
+        else:
+            last_command, error_message = arguments
             err(last_command, error_message)
-        except KeyboardInterrupt:
-            raise SystemExit(200)
-        except error.RateLimitError:
-            raise SystemExit(210)
-        except error.AuthenticationError:
-            raise SystemExit(220)
+    except KeyboardInterrupt:
+        raise SystemExit(200)
+    except error.RateLimitError:
+        raise SystemExit(210)
+    except error.AuthenticationError:
+        raise SystemExit(220)
