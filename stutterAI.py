@@ -8,7 +8,7 @@ import openai
 from openai import error
 
 
-MODEL = "gpt-4"
+MODEL = "gpt-4-1106-preview"
 
 try:
     with open(Path("~/.stutterAI_secret.json").expanduser(), "r") as f:
@@ -52,7 +52,7 @@ def ai_create_command(ai_prompt):
         messages=[
             {
                 "role": "system",
-                "content": "You are an AI that creates oneliner linux bash commands based on prompts from users. Create a working command that follows best practice and official documentation that will accomplish the users prompt. Return command only and nothing else, unless the prompt is unrelated to linux commands then return the exact statement 'Sorry I can't help with that.'",
+                "content": "You are an AI that creates one-liner linux bash commands based on prompts from users. Create a working command that follows best practice and official documentation that will accomplish the users prompt. Return command ONLY with no formatting, unless the prompt is unrelated to linux commands then return the exact statement 'Sorry I can't help with that.'",
             },
             {"role": "user", "content": json.dumps(ai_prompt)},
         ],
@@ -70,7 +70,7 @@ def ai_fix_command(data):
         messages=[
             {
                 "role": "system",
-                "content": "You are an AI that fixes mistakes in terminal commands. Using the information provided, respond with a corrected version of the command. Prioritize barchrc alias and functions if it is a closer match than other commands. Return fixed command only and nothing else.",
+                "content": "You are an AI that fixes mistakes in terminal commands. Using the information provided, respond with a corrected version of the command. Prioritize barchrc alias and functions if it is a closer match than other commands. Return fixed command ONLY with no formatting.",
             },
             {"role": "user", "content": json.dumps(data)},
         ],
@@ -135,7 +135,7 @@ def ai_find_valid_path(path, cwd):
         ai_messages = [
             {
                 "role": "system",
-                "content": "Fix the user provided invalid path by replacing elements of the invalid path with extremely similar elements from one of the valid paths. Response must have the same amount of elements as the invalid path. Respond with the fixed path ONLY and nothing else. No formatting.",
+                "content": "Fix the user provided invalid path by replacing elements of the invalid path with extremely similar elements from one of the valid paths. Response must have the same amount of elements as the invalid path. Respond with the fixed path ONLY with no formatting.",
             },
             {
                 "role": "user",
