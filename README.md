@@ -7,7 +7,7 @@ stutterAI solves two huge pain points people have in the terminal:
 * Corrects typos and syntax errors in commands and file paths. *[err](#err)*
 * Generates system-aware commands from a prompt. For when you know what you want to do but don't know how to make it happen. *[uhm](#uhm)*
   
-It uses the openAI API *(BYOK)* and the gpt-4-1106-preview model by default; you can change to gpt-3.5-turbo by modifying [this variable](https://github.com/CyberDefend3r/stutterAI/blob/main/stutterAI.py#L11) in the `stutterAI.py` file, though, in testing it was not reliable.  
+It uses the openAI API *(BYOK)* and the gpt-4-turbo-preview model by default; you can change to gpt-3.5-turbo by modifying [this variable](https://github.com/CyberDefend3r/stutterAI/blob/main/stutterAI.py#L11) in the `stutterAI.py` file, though, in testing it was not reliable.  
 
 stutterAI will not execute any commands it generates; instead, it adds them to your bash history. Additionally, when using it to fix a previously run command, it replaces the broken command with a working one in the bash history. To run a command it makes, just press up on the keyboard.  
   
@@ -31,7 +31,7 @@ Know what you want a command to do but don't know how to write it? Just type `uh
 1. Clone or download this repository.
 2. Open the terminal.
 3. `cd` to the directory containing stutterAI files downloaded.
-4. Type `sh install_stutterAI.sh` and press enter.
+4. Type `bash install_stutterAI.sh` and press enter.
 5. Enter your openAI API key when prompted.
 
 There is one optional but **recommended** step to add 2 lines to your .bashrc file to keep your bash history updated and clean from duplicates etc. The install script will tell you how and provide a oneliner command to add them if you choose to do so. Details [here.](https://www.geeksforgeeks.org/histcontrol-command-in-linux-with-examples/#)
