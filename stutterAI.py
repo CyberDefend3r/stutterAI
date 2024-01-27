@@ -8,7 +8,7 @@ import openai
 from openai import error
 
 
-MODEL = "gpt-4-1106-preview"
+MODEL = "gpt-4-turbo-preview"
 
 try:
     with open(Path("~/.stutterAI_secret.json").expanduser(), "r") as f:
