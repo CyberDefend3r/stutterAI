@@ -70,7 +70,7 @@ def ai_fix_command(data):
         messages=[
             {
                 "role": "system",
-                "content": "You are an AI that fixes mistakes in terminal commands. Using the information provided, respond with a corrected version of the command. Prioritize barchrc alias and functions if it is a closer match than other commands. Return fixed command ONLY with no formatting.",
+                "content": "You are an AI that fixes mistakes in terminal commands. Using the information provided, respond with a corrected version of the command. Prioritize bashrc alias and functions if it is a closer match than other commands. Return fixed command ONLY with no formatting.",
             },
             {"role": "user", "content": json.dumps(data)},
         ],
@@ -139,7 +139,7 @@ def ai_find_valid_path(path, cwd):
             },
             {
                 "role": "user",
-                "content": f"Operating System: {file_data['operating_system']}\nInvalid PAth: {file_data['broken_file_path']}\nThese Path elements are valid: {'NONE' if str(valid_path) == '.' else str(valid_path)}\nList of Paths with valid next elements:{file_data['list_of_valid_paths']}",
+                "content": f"Operating System: {file_data['operating_system']}\nInvalid Path: {file_data['broken_file_path']}\nThese Path elements are valid: {'NONE' if str(valid_path) == '.' else str(valid_path)}\nList of Paths with valid next elements:{file_data['list_of_valid_paths']}",
             },
         ]
         if i >= 1:
