@@ -13,10 +13,6 @@ echo "stutterAI"
 echo "Your AI assistant in the terminal."
 echo -e "${BOLD_UNDERLINE}                                  ${COLOR_RST}"
 echo ""
-if [[ $(echo $PATH | grep "/.local/bin") == "" ]]; then
-  echo -e "[${COLOR_YELLOW} WARN ${COLOR_RST}] \"\$HOME/.local/bin\" is not in PATH. Please add it or stutterAI may not work properly."
-fi
-
 # Check Python version
 echo "[ INFO ] Checking Python version"
 python_version=$(python3 --version 2>&1)
@@ -95,10 +91,7 @@ echo -e "[${COLOR_GREEN} PASS ${COLOR_RST}] Files copied to $HOME/.local/bin/stu
 
 # Prompt for OpenAI API Key and save to JSON
 read -s -p "Please paste your OpenAI API Key and press ENTER: " api_key
-if [ $api_key == $'']; then
-  echo -e "${NL}[${COLOR_RED} FAIL ${COLOR_RST}] No API Key provided. Aborting Installation!"
-  exit 1
-else
+if ! [[ $(echo -e "$api_key" | grep '^[a-zA-Z0-9].*$') == "" ]]; then
   echo "{\"API_KEY\": \"$api_key\"}" > $HOME/.stutterAI_secret.json
   if [ $? -ne 0 ]; then
     echo -e "${NL}[${COLOR_RED} FAIL ${COLOR_RST}] Failed to write API Key to JSON file. Aborting Installation!"
@@ -106,9 +99,12 @@ else
     api_key=$(printf '0%.0s' {1..100})
     exit 1
   fi
-  echo $'\n[ INFO ] Overwriting API Key in memory with zeros'
+  echo -e "${NL}[${COLOR_GREEN} PASS ${COLOR_RST}] Your API Key is located here: $HOME/.stutterAI_secret.json"
+  echo $'[ INFO ] Overwriting API Key in memory with zeros'
   api_key=$(printf '0%.0s' {1..100})
-  echo -e "[${COLOR_GREEN} PASS ${COLOR_RST}] Your API Key is located here: $HOME/.stutterAI_secret.json"
+else
+  echo -e "${NL}[${COLOR_RED} FAIL ${COLOR_RST}] No API Key provided. Aborting Installation!"
+  exit 1
 fi
 
 # Add to .bashrc
@@ -126,11 +122,14 @@ else
   sed -i '/# stutterAI app commands/,/done/{s|\.local/bin/stutterAI/\*|\.local/bin/stutterAI/commands/\*|}' $HOME/.bashrc
 fi
 
+# Check $PATH
+if [[ $(echo $PATH | grep '^.*\/\.local\/bin.*$') == "" ]]; then
+  echo -e "[${COLOR_YELLOW} WARN ${COLOR_RST}] \"\$HOME/.local/bin\" is not in PATH. Please add it or stutterAI may not work properly."
+fi
 # Echo successful installation
 echo -e "[${COLOR_GREEN} PASS ${COLOR_RST}] INSTALLATION SUCCESSFUL!"
-
+echo -e "${BOLD_UNDERLINE}                                  ${COLOR_RST}"
 # Bash history recommendation
-echo ""
 echo "NOTE:"
 echo "To keep your bash history clean, we recommended adding the following line to your .bashrc file:"
 echo ""
@@ -138,10 +137,11 @@ echo "HISTCONTROL=ignoredups:erasedups"
 echo ""
 echo "You can add it by running the following command or with a text editor."
 echo "echo -e $'\\nHISTCONTROL=ignoredups:erasedups\\n' >> \$HOME/.bashrc"
-echo ""
+echo -e "${BOLD_UNDERLINE}                                  ${COLOR_RST}"
 echo "NOTE:"
 echo "stutterAI will be available the next time you open your terminal."
 echo "To use it immediately run the command: source $HOME/.bashrc"
+echo -e "${BOLD_UNDERLINE}                                  ${COLOR_RST}"
 echo ""
 
 
