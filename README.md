@@ -7,7 +7,7 @@ stutterAI solves two huge pain points people have in the terminal:
 * Corrects typos and syntax errors in commands and file paths. *[err](#err)*
 * Generates system-aware commands from a prompt. For when you know what you want to do but don't know how to make it happen. *[uhm](#uhm)*
   
-It uses the openAI API *(BYOK)* and the gpt-4o-mini model by default; you can change to gpt-4-turbo by modifying [this variable](https://github.com/CyberDefend3r/stutterAI/blob/main/stutterAI.py#L9) in the `stutterAI.py` file, though, in testing it was not reliable.  
+It uses the openAI API *(BYOK)* and the `gpt-4o-mini` model by default; you can change it by modifying [this variable](https://github.com/CyberDefend3r/stutterAI/blob/main/stutterAI.py#L9) in the `stutterAI.py` file.  
 
 stutterAI will not execute any commands it generates; instead, it adds them to your bash history. Additionally, when using it to fix a previously run command, it replaces the broken command with a working one in the bash history. To run a command it makes, just press up on the keyboard.  
   
