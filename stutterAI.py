@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 
-from sys import stdin
 import json
+from sys import stdin
 from pathlib import Path
 import platform
-import openai
-from openai import error
+from openai import OpenAI, RateLimitError, AuthenticationError
 
+MODEL = "gpt-4o-mini"
 
-MODEL = "gpt-4-turbo-preview"
-
+# Load API Key and initialize OpenAI session
 try:
     with open(Path("~/.stutterAI_secret.json").expanduser(), "r") as f:
-        _API_KEY_ = json.load(f)["API_KEY"]
-except FileNotFoundError or KeyError:
+        client = OpenAI(api_key=json.load(f)["API_KEY"], timeout=30.0)
+except (FileNotFoundError, KeyError):
     raise SystemExit(215)
 
 
@@ -46,8 +45,7 @@ def gather_system_data():
 
 
 def ai_create_command(ai_prompt):
-    openai.api_key = _API_KEY_
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=MODEL,
         messages=[
             {
@@ -59,13 +57,12 @@ def ai_create_command(ai_prompt):
         temperature=0.6,
         max_tokens=250,
     )
-    ai_command = response["choices"][0]["message"]["content"]
+    ai_command = response.choices[0].message.content
     return ai_command
 
 
 def ai_fix_command(data):
-    openai.api_key = _API_KEY_
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=MODEL,
         messages=[
             {
@@ -77,13 +74,12 @@ def ai_fix_command(data):
         temperature=0.6,
         max_tokens=250,
     )
-    ai_command = response["choices"][0]["message"]["content"]
+    ai_command = response.choices[0].message.content
     return ai_command
 
 
 def ai_extract_path(command, error_message):
-    openai.api_key = _API_KEY_
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=MODEL,
         messages=[
             {
@@ -98,10 +94,10 @@ def ai_extract_path(command, error_message):
         temperature=0.25,
         max_tokens=100,
     )
-    if response["choices"][0]["message"]["content"] == "0":
+    if response.choices[0].message.content == "0":
         return False
     else:
-        return response["choices"][0]["message"]["content"].replace('\\"', "").replace("\\", "").replace('"', "")
+        return response.choices[0].message.content.replace('\\"', "").replace("\\", "").replace('"', "")
 
 
 def ai_find_valid_path(path, cwd):
@@ -146,7 +142,7 @@ def ai_find_valid_path(path, cwd):
             ai_messages.append(
                 {
                     "role": "assistant",
-                    "content": response["choices"][0]["message"]["content"].replace('\\"', "").replace("\\", "").replace('"', ""),
+                    "content": response.choices[0].message.content.replace('\\"', "").replace("\\", "").replace('"', ""),
                 }
             )
             ai_messages.append(
@@ -156,9 +152,8 @@ def ai_find_valid_path(path, cwd):
                 }
             )
         print(ai_messages)
-        openai.api_key = _API_KEY_
-        response = openai.ChatCompletion.create(model=MODEL, messages=ai_messages, temperature=0.0, max_tokens=512)
-        valid_path = Path(response["choices"][0]["message"]["content"].replace('\\"', "").replace("\\", "").replace('"', ""))
+        response = client.chat.completions.create(model=MODEL, messages=ai_messages, temperature=0.0, max_tokens=512)
+        valid_path = Path(response.choices[0].message.content.replace('\\"', "").replace("\\", "").replace('"', ""))
         valid_path_elements = len(str(valid_path).split("/"))
         print(f"\n{valid_path}\n")
         if path_elements != valid_path_elements:
@@ -217,7 +212,7 @@ if __name__ == "__main__":
             err(last_command, error_message)
     except KeyboardInterrupt:
         raise SystemExit(200)
-    except error.RateLimitError:
+    except RateLimitError:
         raise SystemExit(210)
-    except error.AuthenticationError:
+    except AuthenticationError:
         raise SystemExit(220)

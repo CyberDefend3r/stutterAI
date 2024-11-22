@@ -43,8 +43,8 @@ if [ $openai_version == $'' ]; then
 fi
 
 # Check if OpenAI package needs upgrading
-if [[ $(echo -e "0.28.0\n$openai_version" | sort -V | head -n1) != "0.28.0" ]]; then
-  echo -e "[${COLOR_YELLOW} WARN ${COLOR_RST}] openai 0.28.0 or higher is required. You have $openai_version."
+if [[ $(echo -e "1.0.0\n$openai_version" | sort -V | head -n1) != "1.0.0" ]]; then
+  echo -e "[${COLOR_YELLOW} WARN ${COLOR_RST}] openai 1.0.0 or higher is required. You have $openai_version."
   read -n1 -p "Would you like to upgrade the openai package? (y/n)"
   if [[ $REPLY == $'y' ]]; then
     echo "[ INFO ] Upgrading openai with the command: pip3 install openai --upgrade --user"
